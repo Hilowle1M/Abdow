@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>View Found Items</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+</head>
+<body class="bg-gray-50">
+  <header class="bg-green-700 text-white p-4 text-center">
+    <h1 class="text-xl font-bold">Lost & Found Tracker</h1>
+  </header>
+
+  <main class="max-w-4xl mx-auto mt-10 p-6 bg-white shadow-md rounded">
+    <h2 class="text-2xl font-semibold mb-6 text-center">Recently Found Items</h2>
+    <input type="text" placeholder="Search items..." class="w-full mb-4 p-2 border rounded" id="searchInput">
+    <div id="foundList" class="space-y-4"></div>
+  </main>
+
+  <script>
+    const listContainer = document.getElementById('foundList');
+    const searchInput = document.getElementById('searchInput');
+    let allItems = [];
+
+    async function fetchFoundItems() {
+      try {
+        const res = await fetch('http://localhost:3000/found-items');
+        const data = await res.json();
+        allItems = data;
+        renderItems('');
+      } catch (err) {
+        listContainer.innerHTML = "<p class='text-red-500'>❌ Error loading found items.</p>";
+        console.error(err);
+      }
+    }
+
+    function renderItems(filter) {
+      listContainer.innerHTML = '';
+      allItems
+        .filter(item => item.Item_Name.toLowerCase().includes(filter.toLowerCase()))
+        .forEach(item => {
+          const div = document.createElement('div');
+          div.className = "border p-4 rounded bg-green-50";
+          div.innerHTML = `
+            <h3 class="text-lg font-bold">${item.Item_Name}</h3>
+            <p>${item.Item_Description}</p>
+            <p class="text-sm text-gray-600">Found at: ${item.Location_Name} on ${item.DateFound.split('T')[0]}</p>
+          `;
+          listContainer.appendChild(div);
+        });
+    }
+
+    searchInput.addEventListener('input', e => renderItems(e.target.value));
+    fetchFoundItems();
+  </script>
+</body>
+</html>

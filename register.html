@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Register</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+  <div class="bg-white p-8 rounded shadow-md w-full max-w-sm">
+    <h2 class="text-2xl font-bold text-center mb-6">User Registration</h2>
+    <form id="registerForm" class="space-y-4">
+  <input type="text" name="username" placeholder="Choose a username" required class="w-full p-2 border rounded" />
+  <input type="email" name="email" placeholder="Your email address" required class="w-full p-2 border rounded" />
+  <input type="password" name="password" placeholder="Choose a password" required class="w-full p-2 border rounded" />
+  <button type="submit" class="w-full bg-green-600 text-white p-2 rounded hover:bg-green-700">Register</button>
+</form>
+
+    <p id="registerMsg" class="text-center mt-4 font-semibold"></p>
+  </div>
+
+  <script>
+    const form = document.getElementById('registerForm');
+    const msg = document.getElementById('registerMsg');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+
+      try {
+        const res = await fetch('http://localhost:3000/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const result = await res.text();
+        msg.textContent = result;
+        msg.style.color = res.ok ? 'green' : 'red';
+        if (res.ok) form.reset();
+      } catch (err) {
+        msg.textContent = '❌ Server error.';
+        msg.style.color = 'red';
+        console.error(err);
+      }
+    });
+  </script>
+</body>
+</html>
